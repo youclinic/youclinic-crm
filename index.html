@@ -1,214 +1,134 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YouClinic CRM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-      background: #f0f2f5;
-    }
-    .sidebar {
-      width: 240px;
-      background: #003366;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 1rem;
-    }
-    .sidebar img {
-      width: 80px;
-      margin-bottom: 0.5rem;
-    }
-    .sidebar h1 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-    }
-    .sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 1rem;
-      text-align: left;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1rem;
-    }
-    .sidebar button:hover {
-      background: #0059b3;
-    }
-    .main {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-    }
-    .section {
-      display: none;
-    }
-    .active {
-      display: block;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-    }
-    th, td {
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    th {
-      background: #f5f5f5;
-    }
-    .form-group {
-      margin: 0.5rem 0;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.25rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .btn {
-      margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: #0056b3;
-    }
+    body { font-family: 'Inter', sans-serif; }
+    .active { background-color: #3B82F6; color: white; }
   </style>
 </head>
-<body>
-  <div class="sidebar">
-    <img src="logo.png" alt="Logo" />
-    <h1>YOU CLINIC CRM</h1>
-    <button onclick="switchSection('patients')">Patients</button>
-    <button onclick="switchSection('solds')">Solds</button>
-    <button onclick="switchSection('aftercare')">Aftercare</button>
-  </div>
-  <div class="main">
-    <div id="patients" class="section active">
-      <h2>New Leads</h2>
-      <div class="form-group">
-        <input type="text" id="name" placeholder="Name" />
-        <input type="text" id="age" placeholder="Child Age" />
-        <input type="text" id="phone" placeholder="Phone" />
-        <input type="text" id="email" placeholder="Email" />
-        <input type="text" id="responsible" placeholder="Responsible" />
-        <button class="btn" onclick="addPatient()">+ Add New Patient</button>
+<body class="bg-gray-100">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-lg p-4">
+      <img src="logo.png" class="w-24 mx-auto mb-2">
+      <h1 class="text-center text-xl font-semibold mb-6">YOU CLINIC CRM</h1>
+      <ul>
+        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('patients')">Patients</button></li>
+        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('solds')">Solds</button></li>
+        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('aftercare')">Aftercare</button></li>
+      </ul>
+    </div>
+
+    <!-- Main -->
+    <div class="flex-1 p-6 overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <input type="text" placeholder="Search by name..." oninput="searchPatient(this.value)" class="border px-3 py-2 rounded w-1/2">
+        <button onclick="openAddModal()" class="bg-blue-500 text-white px-4 py-2 rounded">Add Patient</button>
       </div>
-      <input type="text" id="search" onkeyup="filterPatients()" placeholder="Search by name..." />
-      <select id="filterResponsible" onchange="filterPatients()">
-        <option value="">All</option>
-        <option value="Yunus">Yunus</option>
-        <option value="Elif">Elif</option>
-        <option value="Çağla">Çağla</option>
-      </select>
-      <table id="patientsTable">
-        <thead>
-          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th><th>Actions</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div id="solds" class="section">
-      <h2>Sold Patients</h2>
-      <table id="soldsTable">
-        <thead>
-          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th><th>Actions</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div id="aftercare" class="section">
-      <h2>Aftercare</h2>
-      <table id="aftercareTable">
-        <thead>
-          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      
+      <div id="patients" class="tab"></div>
+      <div id="solds" class="tab hidden"></div>
+      <div id="aftercare" class="tab hidden"></div>
+
+      <div id="patient-profile" class="hidden mt-6 p-4 bg-white shadow rounded"></div>
     </div>
   </div>
 
-  <script>
-    function switchSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
+    <div class="bg-white p-6 rounded shadow w-1/2">
+      <h2 class="text-xl font-semibold mb-4">Add Patient</h2>
+      <div class="space-y-3">
+        <input type="text" placeholder="Child's Name" id="name" class="border px-3 py-2 w-full">
+        <input type="text" placeholder="Age" id="age" class="border px-3 py-2 w-full">
+        <input type="text" placeholder="Phone" id="phone" class="border px-3 py-2 w-full">
+        <input type="text" placeholder="Responsible" id="responsible" class="border px-3 py-2 w-full">
+        <button onclick="addPatient()" class="bg-green-600 text-white px-4 py-2 rounded">Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const patients = [];
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(div => div.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+  }
+
+  function openAddModal() {
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function addPatient() {
+    const newPatient = {
+      name: document.getElementById('name').value,
+      age: document.getElementById('age').value,
+      phone: document.getElementById('phone').value,
+      responsible: document.getElementById('responsible').value,
+      status: 'new',
+      created: new Date().toLocaleString()
+    };
+    patients.push(newPatient);
+    render();
+    document.getElementById('modal').classList.add('hidden');
+  }
+
+  function render() {
+    const tabs = { patients: '', solds: '', aftercare: '' };
+    patients.forEach((p, i) => {
+      let row = `<tr class='cursor-pointer hover:bg-gray-100' onclick='showProfile(${i})'><td class='p-2'>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`;
+      if (p.status === 'sold') tabs.solds += row;
+      else if (p.status === 'aftercare') tabs.aftercare += row;
+      else tabs.patients += row;
+    });
+    for (let key in tabs) {
+      document.getElementById(key).innerHTML = `<table class='w-full bg-white rounded'><tr class='bg-gray-200'><th class='p-2'>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>${tabs[key]}</table>`;
     }
+  }
 
-    const patients = [];
-    const solds = [];
-    const aftercare = [];
+  function showProfile(index) {
+    const p = patients[index];
+    const profile = document.getElementById('patient-profile');
+    profile.innerHTML = `
+      <h2 class='text-xl font-semibold mb-2'>Patient Profile</h2>
+      <p><strong>Name:</strong> ${p.name}</p>
+      <p><strong>Child Age:</strong> ${p.age}</p>
+      <p><strong>Phone:</strong> ${p.phone}</p>
+      <p><strong>Responsible:</strong> ${p.responsible}</p>
+      <p><strong>Created:</strong> ${p.created}</p>
+      ${p.accepted ? `<p><strong>Accepted:</strong> ${p.accepted}</p>` : `<button onclick='accept(${index})' class='bg-yellow-500 text-white px-3 py-1 rounded mt-2'>Mark as Accepted</button>`}
+      ${p.status === 'new' ? `<button onclick='markSold(${index})' class='bg-blue-600 text-white px-3 py-1 rounded mt-2'>Mark as Sold</button>` : ''}
+      ${p.status === 'sold' ? `<button onclick='markAftercare(${index})' class='bg-green-600 text-white px-3 py-1 rounded mt-2'>Treatment Done</button>` : ''}
+    `;
+    profile.classList.remove('hidden');
+  }
 
-    function addPatient() {
-      const name = document.getElementById('name').value;
-      const age = document.getElementById('age').value;
-      const phone = document.getElementById('phone').value;
-      const email = document.getElementById('email').value;
-      const responsible = document.getElementById('responsible').value;
-      const entry = { name, age, phone, email, responsible };
-      patients.push(entry);
-      updateTables();
-    }
+  function accept(index) {
+    patients[index].accepted = new Date().toLocaleString();
+    showProfile(index);
+  }
 
-    function markAsSold(index) {
-      solds.push(patients.splice(index, 1)[0]);
-      updateTables();
-    }
+  function markSold(index) {
+    patients[index].status = 'sold';
+    render();
+  }
 
-    function markAsDone(index) {
-      aftercare.push(solds.splice(index, 1)[0]);
-      updateTables();
-    }
+  function markAftercare(index) {
+    patients[index].status = 'aftercare';
+    render();
+  }
 
-    function updateTables() {
-      const patientsTable = document.querySelector('#patientsTable tbody');
-      const soldsTable = document.querySelector('#soldsTable tbody');
-      const aftercareTable = document.querySelector('#aftercareTable tbody');
-      patientsTable.innerHTML = '';
-      soldsTable.innerHTML = '';
-      aftercareTable.innerHTML = '';
-
-      patients.forEach((p, i) => {
-        patientsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsSold(${i})">Mark as Sold</button></td></tr>`;
-      });
-      solds.forEach((p, i) => {
-        soldsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsDone(${i})">Treatment Done</button></td></tr>`;
-      });
-      aftercare.forEach(p => {
-        aftercareTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`;
-      });
-    }
-
-    function filterPatients() {
-      const search = document.getElementById('search').value.toLowerCase();
-      const responsible = document.getElementById('filterResponsible').value;
-      const filtered = patients.filter(p =>
-        p.name.toLowerCase().includes(search) &&
-        (responsible === '' || p.responsible === responsible)
-      );
-      const patientsTable = document.querySelector('#patientsTable tbody');
-      patientsTable.innerHTML = '';
-      filtered.forEach((p, i) => {
-        patientsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsSold(${i})">Mark as Sold</button></td></tr>`;
-      });
-    }
-  </script>
+  function searchPatient(value) {
+    const filtered = patients.filter(p => p.name.toLowerCase().includes(value.toLowerCase()));
+    const html = filtered.map((p, i) => `<tr onclick='showProfile(${i})'><td class='p-2'>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`).join('');
+    document.getElementById('patients').innerHTML = `<table class='w-full bg-white rounded'><tr class='bg-gray-200'><th class='p-2'>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>${html}</table>`;
+  }
+</script>
 </body>
 </html>
