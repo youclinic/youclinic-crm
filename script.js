@@ -6,8 +6,7 @@ function showSection(section) {
   currentSection = section;
   selectedPatient = null;
   document.getElementById("patientDetails").classList.add("hidden");
-  renderPatients();
-   // ✅ Aktif butonları güncelle
+
   document.querySelectorAll(".section-buttons button").forEach(btn => {
     if (btn.getAttribute("data-section") === section) {
       btn.classList.add("active");
@@ -15,6 +14,8 @@ function showSection(section) {
       btn.classList.remove("active");
     }
   });
+
+  renderPatients();
 }
 
 function addPatient() {
