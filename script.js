@@ -7,6 +7,14 @@ function showSection(section) {
   selectedPatient = null;
   document.getElementById("patientDetails").classList.add("hidden");
   renderPatients();
+   // ✅ Aktif butonları güncelle
+  document.querySelectorAll(".section-buttons button").forEach(btn => {
+    if (btn.getAttribute("data-section") === section) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
 }
 
 function addPatient() {
