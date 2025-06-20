@@ -1,23 +1,36 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YouClinic CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       display: flex;
       height: 100vh;
+      background: #f0f2f5;
     }
     .sidebar {
-      width: 220px;
-      background: #004080;
+      width: 240px;
+      background: #003366;
       color: white;
       display: flex;
       flex-direction: column;
+      align-items: center;
       padding-top: 1rem;
+    }
+    .sidebar img {
+      width: 80px;
+      margin-bottom: 0.5rem;
+    }
+    .sidebar h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
     }
     .sidebar button {
       background: none;
@@ -35,8 +48,13 @@
     .main {
       flex: 1;
       padding: 1rem;
-      background: #f0f2f5;
       overflow-y: auto;
+    }
+    .section {
+      display: none;
+    }
+    .active {
+      display: block;
     }
     table {
       width: 100%;
@@ -51,136 +69,145 @@
     th {
       background: #f5f5f5;
     }
-    .patient-details {
-      margin-top: 1rem;
-      background: white;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      display: none;
-    }
     .form-group {
       margin: 0.5rem 0;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.25rem;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+    .btn {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <button onclick="showSection('patients')">Patients</button>
-    <button onclick="showSection('solds')">Solds</button>
-    <button onclick="showSection('aftercare')">Aftercare</button>
+    <img src="logo.png" alt="Logo" />
+    <h1>YOU CLINIC CRM</h1>
+    <button onclick="switchSection('patients')">Patients</button>
+    <button onclick="switchSection('solds')">Solds</button>
+    <button onclick="switchSection('aftercare')">Aftercare</button>
   </div>
   <div class="main">
-    <div id="patients" class="section">
+    <div id="patients" class="section active">
       <h2>New Leads</h2>
-      <table>
+      <div class="form-group">
+        <input type="text" id="name" placeholder="Name" />
+        <input type="text" id="age" placeholder="Child Age" />
+        <input type="text" id="phone" placeholder="Phone" />
+        <input type="text" id="email" placeholder="Email" />
+        <input type="text" id="responsible" placeholder="Responsible" />
+        <button class="btn" onclick="addPatient()">+ Add New Patient</button>
+      </div>
+      <input type="text" id="search" onkeyup="filterPatients()" placeholder="Search by name..." />
+      <select id="filterResponsible" onchange="filterPatients()">
+        <option value="">All</option>
+        <option value="Yunus">Yunus</option>
+        <option value="Elif">Elif</option>
+        <option value="Çağla">Çağla</option>
+      </select>
+      <table id="patientsTable">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Child Age</th>
-            <th>Phone</th>
-            <th>Responsible</th>
-          </tr>
+          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th><th>Actions</th></tr>
         </thead>
-        <tbody>
-          <tr onclick="showDetails('Daria', '3 years', '+90 538 000 0000', 'Yunus')">
-            <td>Daria</td>
-            <td>3 years</td>
-            <td>+90 538 000 0000</td>
-            <td>Yunus</td>
-          </tr>
-          <tr onclick="showDetails('Luciana Bravo', '2+', '+90 538 111 1111', 'Elif')">
-            <td>Luciana Bravo</td>
-            <td>2+</td>
-            <td>+90 538 111 1111</td>
-            <td>Elif</td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
-
-    <div id="solds" class="section" style="display:none">
+    <div id="solds" class="section">
       <h2>Sold Patients</h2>
-      <table>
+      <table id="soldsTable">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Child Age</th>
-            <th>Phone</th>
-            <th>Responsible</th>
-          </tr>
+          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th><th>Actions</th></tr>
         </thead>
-        <tbody>
-          <tr onclick="showDetails('Reyhan', '4 years', '+90 538 222 2222', 'Çağla')">
-            <td>Reyhan</td>
-            <td>4 years</td>
-            <td>+90 538 222 2222</td>
-            <td>Çağla</td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
-
-    <div id="aftercare" class="section" style="display:none">
+    <div id="aftercare" class="section">
       <h2>Aftercare</h2>
-      <table>
+      <table id="aftercareTable">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Child Age</th>
-            <th>Phone</th>
-            <th>Responsible</th>
-          </tr>
+          <tr><th>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>
         </thead>
-        <tbody>
-          <tr onclick="showDetails('Ahmet', '6 years', '+90 538 333 3333', 'Sıla')">
-            <td>Ahmet</td>
-            <td>6 years</td>
-            <td>+90 538 333 3333</td>
-            <td>Sıla</td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
-    </div>
-
-    <div id="details" class="patient-details">
-      <h3>Patient Profile</h3>
-      <p><strong>Name:</strong> <span id="dName"></span></p>
-      <p><strong>Child Age:</strong> <span id="dAge"></span></p>
-      <p><strong>Phone:</strong> <span id="dPhone"></span></p>
-      <p><strong>Responsible:</strong> <span id="dResponsible"></span></p>
-
-      <div class="form-group">
-        <label for="notes">Notes</label>
-        <textarea id="notes" rows="4" placeholder="Write your notes here..."></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="fileUpload">Upload File (PDF or JPG)</label>
-        <input type="file" id="fileUpload" accept="application/pdf,image/jpeg,image/jpg" />
-      </div>
     </div>
   </div>
 
   <script>
-    function showSection(sectionId) {
-      document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
-      document.getElementById('details').style.display = 'none';
-      document.getElementById(sectionId).style.display = 'block';
+    function switchSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
-    function showDetails(name, age, phone, responsible) {
-      document.getElementById('dName').textContent = name;
-      document.getElementById('dAge').textContent = age;
-      document.getElementById('dPhone').textContent = phone;
-      document.getElementById('dResponsible').textContent = responsible;
-      document.getElementById('details').style.display = 'block';
+    const patients = [];
+    const solds = [];
+    const aftercare = [];
+
+    function addPatient() {
+      const name = document.getElementById('name').value;
+      const age = document.getElementById('age').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const responsible = document.getElementById('responsible').value;
+      const entry = { name, age, phone, email, responsible };
+      patients.push(entry);
+      updateTables();
+    }
+
+    function markAsSold(index) {
+      solds.push(patients.splice(index, 1)[0]);
+      updateTables();
+    }
+
+    function markAsDone(index) {
+      aftercare.push(solds.splice(index, 1)[0]);
+      updateTables();
+    }
+
+    function updateTables() {
+      const patientsTable = document.querySelector('#patientsTable tbody');
+      const soldsTable = document.querySelector('#soldsTable tbody');
+      const aftercareTable = document.querySelector('#aftercareTable tbody');
+      patientsTable.innerHTML = '';
+      soldsTable.innerHTML = '';
+      aftercareTable.innerHTML = '';
+
+      patients.forEach((p, i) => {
+        patientsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsSold(${i})">Mark as Sold</button></td></tr>`;
+      });
+      solds.forEach((p, i) => {
+        soldsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsDone(${i})">Treatment Done</button></td></tr>`;
+      });
+      aftercare.forEach(p => {
+        aftercareTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`;
+      });
+    }
+
+    function filterPatients() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const responsible = document.getElementById('filterResponsible').value;
+      const filtered = patients.filter(p =>
+        p.name.toLowerCase().includes(search) &&
+        (responsible === '' || p.responsible === responsible)
+      );
+      const patientsTable = document.querySelector('#patientsTable tbody');
+      patientsTable.innerHTML = '';
+      filtered.forEach((p, i) => {
+        patientsTable.innerHTML += `<tr><td>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td><td><button onclick="markAsSold(${i})">Mark as Sold</button></td></tr>`;
+      });
     }
   </script>
 </body>
