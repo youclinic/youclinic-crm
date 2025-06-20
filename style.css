@@ -52,13 +52,6 @@ main {
   float: left;
 }
 
-.sidebar img.logo {
-  width: 80px !important;
-  height: auto !important;
-  margin-bottom: 10px;
-  display: block;
-}
-
 .sidebar h2 {
   font-size: 16px;
   margin-bottom: 20px;
@@ -128,11 +121,4 @@ button.primary {
 
 button.primary:hover {
   background-color: #0056b3;
-}
-
-.sidebar-logo {
-  width: 80px;
-  height: auto;
-  display: block;
-  margin-bottom: 10px;
 }
