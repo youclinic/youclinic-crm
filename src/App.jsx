@@ -32,6 +32,7 @@ export default function App() {
   return (
     <div className="App">
       <div className="sidebar">
+        <img src="/logo.png" alt="Logo" style={{ height: '40px', marginBottom: '20px' }} />
         <h2>You Clinic CRM</h2>
         <button className={section==="patients" ? "active" : ""} onClick={()=>setSec("patients")}>Patients</button>
         <button className={section==="solds" ? "active" : ""} onClick={()=>setSec("solds")}>Solds</button>
