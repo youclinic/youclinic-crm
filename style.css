@@ -43,7 +43,7 @@ main {
   overflow-y: auto;
 }
 
-.left-panel {
+.sidebar {
   width: 200px;
   background-color: #f0f0f0;
   padding: 20px;
@@ -52,17 +52,17 @@ main {
   float: left;
 }
 
-.left-panel img.logo {
+.sidebar img.logo {
   width: 100%;
   margin-bottom: 10px;
 }
 
-.left-panel h2 {
+.sidebar h2 {
   font-size: 16px;
   margin-bottom: 20px;
 }
 
-.left-panel nav button {
+.sidebar nav button {
   display: block;
   width: 100%;
   margin-bottom: 10px;
