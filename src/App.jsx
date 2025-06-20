@@ -14,9 +14,22 @@ export default function App() {
     const name = prompt("Adı:");
     if (!name) return;
     const newOne = { name, age: prompt("Yaşı:"), phone: prompt("Telefon:"), responsible: prompt("Sorumlu:"), stage: "new", created: new Date().toLocaleString(), acceptedAt: new Date().toLocaleString(), notes: "", file: null };
-    const newList = [...patients, newOne];
-      setPatients(newList);
-      localStorage.setItem("patients", JSON.stringify(newList));
+    const add = () => {
+  const name = prompt("Adı:");
+  if (!name) return;
+  const newOne = {
+    name,
+    age: prompt("Yaşı?"),
+    phone: prompt("Telefon?"),
+    responsible: prompt("Sorumlu:"),
+    stage: "new",
+    created: new Date().toLocaleString(),
+    acceptedAt: new Date().toLocaleString(),
+  };
+  const newList = [...patients, newOne];
+  localStorage.setItem("patients", JSON.stringify(newList));
+  setPatients(newList);
+};
   };
 
   const toggleSel = (p) => setSel(sel === p ? null : p);
