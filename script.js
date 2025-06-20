@@ -80,7 +80,11 @@ function togglePatientDetails(index) {
     <p><strong>Accepted:</strong> ${selectedPatient.acceptedAt}</p>
     
     <label>Upload File: <input type="file" onchange="uploadFile(event)" /></label>
-    ${selectedPatient.file ? `<p>File: ${selectedPatient.file.name}</p>` : ""}
+    ${
+      selectedPatient.file     
+      ? `<p>File: <a href="${URL.createObjectURL(selectedPatient.file)}" target="_blank">${selectedPatient.file.name}</a></p>`     
+      : "" 
+    }
 
     <textarea placeholder="Notes..." onchange="saveNote(event)">${selectedPatient.notes}</textarea>
     
