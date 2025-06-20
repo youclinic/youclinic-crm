@@ -1,11 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>You Clinic CRM</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>You Clinic CRM</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f7f7f7; }
+    .sidebar {
+      background: #eee;
+      width: 200px;
+      height: 100vh;
+      float: left;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .main {
+      margin-left: 200px;
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    .section-buttons button {
+      margin-right: 10px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
+    #patientDetails { background: #fff; padding: 15px; margin-top: 20px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" style="width: 100%;" alt="You Logo" />
+    <h2>YOU CLINIC CRM</h2>
+    <div class="section-buttons">
+      <button onclick="showSection('patients')">Patients</button>
+      <button onclick="showSection('solds')">Solds</button>
+      <button onclick="showSection('aftercare')">Aftercare</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <input type="text" id="searchInput" placeholder="Search patients..." />
+    <button onclick="addPatient()">Add Patient</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Phone</th>
+          <th>Seller</th>
+        </tr>
+      </thead>
+      <tbody id="patientTableBody"></tbody>
+    </table>
+
+    <div id="patientDetails" class="hidden"></div>
+  </div>
+
+  <script>
+    let patients = JSON.parse(localStorage.getItem("patients") || "[]");
+    let selectedPatient = null;
+    let currentSection = "patients";
+
+    function saveToStorage() {
+      localStorage.setItem("patients", JSON.stringify(patients));
+    }
+
+    function showSection(section) {
+      currentSection = section;
+      selectedPatient = null;
+      document.getElementById("patientDetails").classList.add("hidden");
+      renderPatients();
+    }
+
+    function addPatient() {
+      const name = prompt("Enter patient name:");
+      const age = prompt("Enter child age:");
+      const phone = prompt("Enter phone number:");
+      const responsible = prompt("Enter seller/responsible name:");
+
+      const newPatient = {
+        name, age, phone, responsible,
+        stage: "new", notes: "", file: null,
+        createdAt: new Date().toLocaleString(),
+        acceptedAt: new Date().toLocaleString()
+      };
+
+      patients.push(newPatient);
+      saveToStorage();
+      renderPatients();
+    }
+
+    function renderPatients() {
+      const tableBody = document.getElementById("patientTableBody");
+      tableBody.innerHTML = "";
+
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+      patients
+        .filter(p => p.name.toLowerCase().includes(searchTerm))
+        .filter(p => {
+          if (currentSection === "patients") return p.stage === "new";
+          if (currentSection === "solds") return p.stage === "sold";
+          if (currentSection === "aftercare") return p.stage === "aftercare";
+          return false;
+        })
+        .forEach((p, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.age}</td>
+            <td>${p.phone}</td>
+            <td>${p.responsible}</td>
+          `;
+          row.onclick = () => toggleDetails(index);
+          tableBody.appendChild(row);
+        });
+    }
+
+    function toggleDetails(index) {
+      const detailCard = document.getElementById("patientDetails");
+
+      if (selectedPatient === patients[index]) {
+        selectedPatient = null;
+        detailCard.classList.add("hidden");
+        return;
+      }
+
+      selectedPatient = patients[index];
+      detailCard.classList.remove("hidden");
+
+      let buttons = "";
+      if (selectedPatient.stage === "new") {
+        buttons = `<button onclick="markAsSold()">Mark as Sold</button>`;
+      } else if (selectedPatient.stage === "sold") {
+        buttons = `<button onclick="markAsTreated()">Treatment Done</button>`;
+      }
+
+      detailCard.innerHTML = `
+        <h3>Patient Profile</h3>
+        <p><strong>Name:</strong> ${selectedPatient.name}</p>
+        <p><strong>Age:</strong> ${selectedPatient.age}</p>
+        <p><strong>Phone:</strong> ${selectedPatient.phone}</p>
+        <p><strong>Seller:</strong> ${selectedPatient.responsible}</p>
+        <p><strong>Created:</strong> ${selectedPatient.createdAt}</p>
+        <p><strong>Accepted:</strong> ${selectedPatient.acceptedAt}</p>
+
+        <label>Upload File: <input type="file" onchange="uploadFile(event)" /></label>
+        ${selectedPatient.file ? `<p>File: ${selectedPatient.file.name}</p>` : ""}
+
+        <textarea placeholder="Notes..." onchange="saveNote(event)">${selectedPatient.notes}</textarea>
+
+        ${buttons}
+      `;
+    }
+
+    function uploadFile(event) {
+      if (selectedPatient) {
+        selectedPatient.file = { name: event.target.files[0].name };
+        saveToStorage();
+        toggleDetails(patients.indexOf(selectedPatient));
+      }
+    }
+
+    function saveNote(event) {
+      if (selectedPatient) {
+        selectedPatient.notes = event.target.value;
+        saveToStorage();
+      }
+    }
+
+    function markAsSold() {
+      if (selectedPatient) {
+        selectedPatient.stage = "sold";
+        saveToStorage();
+        selectedPatient = null;
+        document.getElementById("patientDetails").classList.add("hidden");
+        renderPatients();
+      }
+    }
+
+    function markAsTreated() {
+      if (selectedPatient) {
+        selectedPatient.stage = "aftercare";
+        saveToStorage();
+        selectedPatient = null;
+        document.getElementById("patientDetails").classList.add("hidden");
+        renderPatients();
+      }
+    }
+
+    renderPatients();
+  </script>
+</body>
 </html>
