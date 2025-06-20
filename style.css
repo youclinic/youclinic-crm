@@ -53,8 +53,8 @@ main {
 }
 
 .sidebar img.logo {
-  width: 80px;
-  height: auto;
+  width: 80px !important;
+  height: auto !important;
   margin-bottom: 10px;
   display: block;
 }
