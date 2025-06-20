@@ -79,25 +79,27 @@ function togglePatientDetails(index) {
 
   detailCard.classList.remove("hidden");
   detailCard.innerHTML = `
-    <h3>Patient Profile</h3>
-    <p><strong>Name:</strong> ${selectedPatient.name}</p>
-    <p><strong>Age:</strong> ${selectedPatient.age}</p>
-    <p><strong>Phone:</strong> ${selectedPatient.phone}</p>
-    <p><strong>Seller:</strong> ${selectedPatient.responsible}</p>
-    <p><strong>Created:</strong> ${selectedPatient.createdAt}</p>
-    <p><strong>Accepted:</strong> ${selectedPatient.acceptedAt}</p>
-    
-    <label>Upload File: <input type="file" onchange="uploadFile(event)" /></label>
-    ${ selectedPatient.file     
-      ? `<p>File: <a href="${URL.createObjectURL(selectedPatient.file)}" target="_blank">${selectedPatient.file.name}</a></p>`     
-      : "" 
-    }
+  <h3>Patient Profile</h3>
+  <p><strong>Name:</strong> ${selectedPatient.name}</p>
+  <p><strong>Age:</strong> ${selectedPatient.age}</p>
+  <p><strong>Phone:</strong> ${selectedPatient.phone}</p>
+  <p><strong>Seller:</strong> ${selectedPatient.responsible}</p>
+  <p><strong>Created:</strong> ${selectedPatient.createdAt}</p>
+  <p><strong>Accepted:</strong> ${selectedPatient.acceptedAt}</p>
 
-    <textarea placeholder="Notes..." onchange="saveNote(event)">${selectedPatient.notes}</textarea>
-    
-    ${selectedPatient.stage === "new" ? `<button onclick="markAsSold()">Mark as Sold</button>` : ""}
-    ${selectedPatient.stage === "sold" ? `<button onclick="markAsTreated()">Treatment Done</button>` : ""}
-  `;
+  <label>Upload File: 
+    <input type="file" onchange="uploadFile(event)" />
+  </label>
+  ${selectedPatient.file ? `<p>File: <a href="${URL.createObjectURL(selectedPatient.file)}" target="_blank">${selectedPatient.file.name}</a></p>` : ""}
+  
+  <textarea placeholder="Notes..." onchange="saveNote(event)">${selectedPatient.notes}</textarea>
+
+  ${selectedPatient.stage === "new" 
+    ? `<button onclick="markAsSold()">Mark as Sold</button>` 
+    : selectedPatient.stage === "sold" 
+      ? `<button onclick="markAsTreated()">Treatment Done</button>` 
+      : ""}
+`;
 }
 
 function uploadFile(event) {
