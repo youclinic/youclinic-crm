@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import "./App.css";
 
 export default function App() {
-  const [patients, setPatients] = useState([
-    { name: "Demo Hasta", age: "5", phone: "555-5555", responsible: "Anne", stage: "new", created: new Date().toLocaleString(), acceptedAt: new Date().toLocaleString(), notes: "", file: null }
-  ]);
+  const [patients, setPatients] = useState(() => {
+  const saved = localStorage.getItem("patients");
+  return saved ? JSON.parse(saved) : [];
+});
   const [sel, setSel] = useState(null);
   const [section, setSec] = useState("patients");
   const [search, setSearch] = useState("");
@@ -13,7 +14,9 @@ export default function App() {
     const name = prompt("Adı:");
     if (!name) return;
     const newOne = { name, age: prompt("Yaşı:"), phone: prompt("Telefon:"), responsible: prompt("Sorumlu:"), stage: "new", created: new Date().toLocaleString(), acceptedAt: new Date().toLocaleString(), notes: "", file: null };
-    setPatients([...patients, newOne]);
+    const newList = [...patients, newOne];
+      setPatients(newList);
+      localStorage.setItem("patients", JSON.stringify(newList));
   };
 
   const toggleSel = (p) => setSel(sel === p ? null : p);
