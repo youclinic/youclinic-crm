@@ -1,134 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YouClinic CRM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .active { background-color: #3B82F6; color: white; }
-  </style>
-</head>
-<body class="bg-gray-100">
-  <div class="flex h-screen">
-    <!-- Sidebar -->
-    <div class="w-64 bg-white shadow-lg p-4">
-      <img src="logo.png" class="w-24 mx-auto mb-2">
-      <h1 class="text-center text-xl font-semibold mb-6">YOU CLINIC CRM</h1>
-      <ul>
-        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('patients')">Patients</button></li>
-        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('solds')">Solds</button></li>
-        <li><button class="w-full text-left px-4 py-2 hover:bg-blue-100" onclick="switchTab('aftercare')">Aftercare</button></li>
-      </ul>
-    </div>
+// Updated React CRM App with patient detail toggle, file upload, tab switch behavior fix, and refined styling
 
-    <!-- Main -->
-    <div class="flex-1 p-6 overflow-y-auto">
-      <div class="flex justify-between items-center mb-4">
-        <input type="text" placeholder="Search by name..." oninput="searchPatient(this.value)" class="border px-3 py-2 rounded w-1/2">
-        <button onclick="openAddModal()" class="bg-blue-500 text-white px-4 py-2 rounded">Add Patient</button>
-      </div>
-      
-      <div id="patients" class="tab"></div>
-      <div id="solds" class="tab hidden"></div>
-      <div id="aftercare" class="tab hidden"></div>
+import React, { useState } from "react";
+import "./App.css";
 
-      <div id="patient-profile" class="hidden mt-6 p-4 bg-white shadow rounded"></div>
-    </div>
-  </div>
+function App() {
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [section, setSection] = useState("patients");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  <!-- Modal -->
-  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
-    <div class="bg-white p-6 rounded shadow w-1/2">
-      <h2 class="text-xl font-semibold mb-4">Add Patient</h2>
-      <div class="space-y-3">
-        <input type="text" placeholder="Child's Name" id="name" class="border px-3 py-2 w-full">
-        <input type="text" placeholder="Age" id="age" class="border px-3 py-2 w-full">
-        <input type="text" placeholder="Phone" id="phone" class="border px-3 py-2 w-full">
-        <input type="text" placeholder="Responsible" id="responsible" class="border px-3 py-2 w-full">
-        <button onclick="addPatient()" class="bg-green-600 text-white px-4 py-2 rounded">Save</button>
-      </div>
-    </div>
-  </div>
+  const addPatient = () => {
+    const name = prompt("Enter patient name");
+    const age = prompt("Enter child age");
+    const phone = prompt("Enter phone number");
+    const responsible = prompt("Enter responsible name");
 
-<script>
-  const patients = [];
-
-  function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach(div => div.classList.add('hidden'));
-    document.getElementById(tab).classList.remove('hidden');
-  }
-
-  function openAddModal() {
-    document.getElementById('modal').classList.remove('hidden');
-  }
-
-  function addPatient() {
     const newPatient = {
-      name: document.getElementById('name').value,
-      age: document.getElementById('age').value,
-      phone: document.getElementById('phone').value,
-      responsible: document.getElementById('responsible').value,
-      status: 'new',
-      created: new Date().toLocaleString()
+      name,
+      age,
+      phone,
+      responsible,
+      createdAt: new Date().toLocaleString(),
+      acceptedAt: new Date().toLocaleString(),
+      stage: "new",
+      file: null,
+      notes: "",
     };
-    patients.push(newPatient);
-    render();
-    document.getElementById('modal').classList.add('hidden');
-  }
 
-  function render() {
-    const tabs = { patients: '', solds: '', aftercare: '' };
-    patients.forEach((p, i) => {
-      let row = `<tr class='cursor-pointer hover:bg-gray-100' onclick='showProfile(${i})'><td class='p-2'>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`;
-      if (p.status === 'sold') tabs.solds += row;
-      else if (p.status === 'aftercare') tabs.aftercare += row;
-      else tabs.patients += row;
-    });
-    for (let key in tabs) {
-      document.getElementById(key).innerHTML = `<table class='w-full bg-white rounded'><tr class='bg-gray-200'><th class='p-2'>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>${tabs[key]}</table>`;
+    setPatients([...patients, newPatient]);
+    setSelectedPatient(null);
+  };
+
+  const updatePatientStage = (patient, newStage) => {
+    const updatedPatients = patients.map((p) =>
+      p === patient ? { ...p, stage: newStage } : p
+    );
+    setPatients(updatedPatients);
+    setSelectedPatient(null);
+  };
+
+  const handlePatientClick = (patient) => {
+    if (selectedPatient === patient) {
+      setSelectedPatient(null);
+    } else {
+      setSelectedPatient(patient);
     }
-  }
+  };
 
-  function showProfile(index) {
-    const p = patients[index];
-    const profile = document.getElementById('patient-profile');
-    profile.innerHTML = `
-      <h2 class='text-xl font-semibold mb-2'>Patient Profile</h2>
-      <p><strong>Name:</strong> ${p.name}</p>
-      <p><strong>Child Age:</strong> ${p.age}</p>
-      <p><strong>Phone:</strong> ${p.phone}</p>
-      <p><strong>Responsible:</strong> ${p.responsible}</p>
-      <p><strong>Created:</strong> ${p.created}</p>
-      ${p.accepted ? `<p><strong>Accepted:</strong> ${p.accepted}</p>` : `<button onclick='accept(${index})' class='bg-yellow-500 text-white px-3 py-1 rounded mt-2'>Mark as Accepted</button>`}
-      ${p.status === 'new' ? `<button onclick='markSold(${index})' class='bg-blue-600 text-white px-3 py-1 rounded mt-2'>Mark as Sold</button>` : ''}
-      ${p.status === 'sold' ? `<button onclick='markAftercare(${index})' class='bg-green-600 text-white px-3 py-1 rounded mt-2'>Treatment Done</button>` : ''}
-    `;
-    profile.classList.remove('hidden');
-  }
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    const updatedPatients = patients.map((p) =>
+      p === selectedPatient ? { ...p, file } : p
+    );
+    setPatients(updatedPatients);
+  };
 
-  function accept(index) {
-    patients[index].accepted = new Date().toLocaleString();
-    showProfile(index);
-  }
+  const handleNoteChange = (e) => {
+    const updatedPatients = patients.map((p) =>
+      p === selectedPatient ? { ...p, notes: e.target.value } : p
+    );
+    setPatients(updatedPatients);
+  };
 
-  function markSold(index) {
-    patients[index].status = 'sold';
-    render();
-  }
+  const filteredPatients = patients.filter(
+    (p) =>
+      p.stage === section &&
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  function markAftercare(index) {
-    patients[index].status = 'aftercare';
-    render();
-  }
+  return (
+    <div className="app">
+      <aside className="sidebar">
+        <img src="/logo.png" alt="Logo" className="logo" />
+        <h2>YOU CLINIC CRM</h2>
+        <nav>
+          <button onClick={() => setSection("new")}>Patients</button>
+          <button onClick={() => setSection("sold")}>Solds</button>
+          <button onClick={() => setSection("aftercare")}>Aftercare</button>
+        </nav>
+      </aside>
+      <main>
+        <header className="topbar">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className="add-button" onClick={addPatient}>
+            Add Patient
+          </button>
+        </header>
+        <div className="table">
+          <div className="table-header">
+            <div>Name</div>
+            <div>Age</div>
+            <div>Phone</div>
+            <div>Responsible</div>
+          </div>
+          {filteredPatients.map((patient, idx) => (
+            <div
+              key={idx}
+              className="table-row"
+              onClick={() => handlePatientClick(patient)}
+            >
+              <div>{patient.name}</div>
+              <div>{patient.age}</div>
+              <div>{patient.phone}</div>
+              <div>{patient.responsible}</div>
+            </div>
+          ))}
+        </div>
 
-  function searchPatient(value) {
-    const filtered = patients.filter(p => p.name.toLowerCase().includes(value.toLowerCase()));
-    const html = filtered.map((p, i) => `<tr onclick='showProfile(${i})'><td class='p-2'>${p.name}</td><td>${p.age}</td><td>${p.phone}</td><td>${p.responsible}</td></tr>`).join('');
-    document.getElementById('patients').innerHTML = `<table class='w-full bg-white rounded'><tr class='bg-gray-200'><th class='p-2'>Name</th><th>Age</th><th>Phone</th><th>Responsible</th></tr>${html}</table>`;
-  }
-</script>
-</body>
-</html>
+        {selectedPatient && section === selectedPatient.stage && (
+          <div className="profile">
+            <h3>Patient Profile</h3>
+            <p><strong>Name:</strong> {selectedPatient.name}</p>
+            <p><strong>Child Age:</strong> {selectedPatient.age}</p>
+            <p><strong>Phone:</strong> {selectedPatient.phone}</p>
+            <p><strong>Responsible:</strong> {selectedPatient.responsible}</p>
+            <p><strong>Created:</strong> {selectedPatient.createdAt}</p>
+            <p><strong>Accepted:</strong> {selectedPatient.acceptedAt}</p>
+
+            <textarea
+              placeholder="Write your notes here..."
+              value={selectedPatient.notes}
+              onChange={handleNoteChange}
+            />
+
+            <input type="file" onChange={handleFileChange} />
+
+            {selectedPatient.stage === "new" && (
+              <button onClick={() => updatePatientStage(selectedPatient, "sold")}>
+                Mark as Sold
+              </button>
+            )}
+            {selectedPatient.stage === "sold" && (
+              <button onClick={() => updatePatientStage(selectedPatient, "aftercare")}>
+                Treatment Done
+              </button>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
